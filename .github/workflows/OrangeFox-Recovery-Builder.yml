@@ -124,14 +124,15 @@ jobs:
           cd "${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}"
           BOARD_CONFIG="${{ github.event.inputs.DEVICE_PATH }}/BoardConfig.mk"
           if grep -q '^TARGET_SUPPORTS_64_BIT_APPS[[:space:]]*:=' "$BOARD_CONFIG"; then
-            sed -i \
-              's/^TARGET_SUPPORTS_64_BIT_APPS[[:space:]]*:=.*/TARGET_SUPPORTS_64_BIT_APPS := true/' \
-              "$BOARD_CONFIG"
+            sed -i 's/^TARGET_SUPPORTS_64_BIT_APPS[[:space:]]*:=.*/TARGET_SUPPORTS_64_BIT_APPS := true/' "$BOARD_CONFIG"
           else
             echo 'TARGET_SUPPORTS_64_BIT_APPS := true' >> "$BOARD_CONFIG"
           fi
-          echo "64-bit app support configured:"
-          grep 'TARGET_SUPPORTS_64_BIT_APPS' "$BOARD_CONFIG"
+          VENDOR_SETUP="${{ github.event.inputs.DEVICE_PATH }}/vendorsetup.sh"
+          sed -i '/FOX_VERSION=/d' "$VENDOR_SETUP"
+          grep -q 'FOX_MAINTAINER_PATCH_VERSION=' "$VENDOR_SETUP" || \
+            echo 'export FOX_MAINTAINER_PATCH_VERSION="3"' >> "$VENDOR_SETUP"
+          echo "Device configuration patched successfully."
       - name: Check Manifest Branch
         uses: haya14busa/action-cond@v1
         id: fox_branch
