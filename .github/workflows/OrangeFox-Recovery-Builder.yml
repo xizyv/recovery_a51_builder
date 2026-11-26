@@ -143,7 +143,15 @@ jobs:
         run: |
           export CURR_DEVICE="${{ inputs.CURR_DEVICE }}"
           cd "${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}"
+          set +e
           source build/envsetup.sh
+          ENVSETUP_STATUS=$?
+          set -e
+          echo "envsetup exit code: $ENVSETUP_STATUS"
+          if ! declare -F lunch > /dev/null; then
+            echo "ERROR: lunch function was not loaded."
+            exit 1
+          fi
           export ALLOW_MISSING_DEPENDENCIES=true
           ${{ steps.fox_branch.outputs.value }}
       - name: Set Build Date
