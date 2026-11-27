@@ -115,6 +115,7 @@ jobs:
 
       - name: Build OrangeFox Recovery
         run: |
+          cd "$GITHUB_WORKSPACE/OrangeFox/fox_$FOX_BRANCH"
           
           echo "=== CHECKING ANDROID MAKEFILE ==="
           ls -l frameworks/base/services/core/xsd/vts/Android.mk || true
