@@ -115,19 +115,29 @@ jobs:
 
       - name: Build OrangeFox Recovery
         run: |
+          
+          echo "=== CHECKING ANDROID MAKEFILE ==="
+          ls -l frameworks/base/services/core/xsd/vts/Android.mk || true
+
+          echo "=== BEFORE ENVSETUP ==="
+
+          set +e
+          source build/envsetup.sh
+          ENVSETUP_STATUS=$?
           set -e
 
-          cd "$GITHUB_WORKSPACE/OrangeFox/fox_$FOX_BRANCH"
+          echo "=== AFTER ENVSETUP ==="
+          echo "ENVSETUP_STATUS=$ENVSETUP_STATUS"
 
-          export FOX_BUILD_DEVICE="$DEVICE_NAME"
-          export ALLOW_MISSING_DEPENDENCIES=true
-          export LC_ALL=C
-
-          source build/envsetup.sh
+          if [ "$ENVSETUP_STATUS" -ne 0 ]; then
+            echo "Environment setup returned an error"
+            exit "$ENVSETUP_STATUS"
+          fi
 
           lunch twrp_a51-eng
 
           mka adbd recoveryimage
+
 
       - name: Check Recovery Image
         run: |
