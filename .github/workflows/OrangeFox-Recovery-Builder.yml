@@ -116,29 +116,38 @@ jobs:
       - name: Build OrangeFox Recovery
         run: |
           cd "$GITHUB_WORKSPACE/OrangeFox/fox_$FOX_BRANCH"
-          
+
           echo "=== CHECKING ANDROID MAKEFILE ==="
           ls -l frameworks/base/services/core/xsd/vts/Android.mk || true
 
-          echo "=== BEFORE ENVSETUP ==="
+          echo "=== LOADING BUILD ENVIRONMENT ==="
 
           set +e
           source build/envsetup.sh
           ENVSETUP_STATUS=$?
           set -e
 
-          echo "=== AFTER ENVSETUP ==="
-          echo "ENVSETUP_STATUS=$ENVSETUP_STATUS"
+          echo "=== ENVSETUP STATUS: $ENVSETUP_STATUS ==="
 
-          if [ "$ENVSETUP_STATUS" -ne 0 ]; then
-            echo "Environment setup returned an error"
-            exit "$ENVSETUP_STATUS"
+          if ! command -v lunch >/dev/null 2>&1; then
+            echo "ERROR: lunch command is unavailable"
+            exit 1
           fi
 
+          if ! command -v mka >/dev/null 2>&1; then
+            echo "ERROR: mka command is unavailable"
+            exit 1
+          fi
+
+          if [ "$ENVSETUP_STATUS" -ne 0 ]; then
+            echo "WARNING: envsetup returned $ENVSETUP_STATUS, but lunch and mka are available."
+          fi
+
+          echo "=== CONFIGURING A51 ==="
           lunch twrp_a51-eng
 
+          echo "=== BUILDING RECOVERY ==="
           mka adbd recoveryimage
-
 
       - name: Check Recovery Image
         run: |
