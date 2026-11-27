@@ -131,6 +131,7 @@ jobs:
           VENDOR_SETUP="${{ github.event.inputs.DEVICE_PATH }}/vendorsetup.sh"
           sed -i '/FOX_VERSION=/d' "$VENDOR_SETUP"
           sed -i 's/export OF_VANILLA_BUILD=1/export FOX_VANILLA_BUILD=1/' "$VENDOR_SETUP"
+          sed -i 's/export OF_TARGET_DEVICES=/export FOX_TARGET_DEVICES=/' "$VENDOR_SETUP"
           grep -q 'FOX_MAINTAINER_PATCH_VERSION=' "$VENDOR_SETUP" || \
             echo 'export FOX_MAINTAINER_PATCH_VERSION="3"' >> "$VENDOR_SETUP"
           echo "Device configuration patched successfully."
